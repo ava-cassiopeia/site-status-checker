@@ -1,0 +1,11 @@
+{
+    "goodIp": "[ip]",
+    "sites": [
+        {
+            "name": "[pretty name for console output]",
+            "domains": [
+                
+            ]
+        }
+    ]
+}
