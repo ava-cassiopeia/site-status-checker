@@ -1,5 +1,6 @@
 {
     "goodIp": "[ip]",
+    "reverseProxyRegex": "[(optional) regex for reverse proxy name match]",
     "sites": [
         {
             "name": "[pretty name for console output]",

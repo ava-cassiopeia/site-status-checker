@@ -1,5 +1,6 @@
 const ping = require('ping');
 const chalk = require('chalk');
+const whois = require("node-whois");
 
 const LOG_LEVEL = {
     INFORMATION: 0
@@ -50,9 +51,31 @@ class PingManager {
 
                 successes += 1;
             } else {
-                this.log(chalk.red(`\tx ${domain}: ${res.numeric_host}`));
+                const whoisData = await this.whois(res.numeric_host);
+                const orgName = whoisData.OrgName;
 
-                failures += 1;
+                let colorFunction = chalk.red;
+                let statusSymbol = "x";
+                let addToFailures = true;
+
+                if(this.config.reverseProxyRegex && orgName) {
+                    const regex = new RegExp(this.config.reverseProxyRegex, "gi");
+                    const doesMatchReverseProxy = regex.test(orgName);
+
+                    if(doesMatchReverseProxy) {
+                        colorFunction = chalk.yellow;
+                        statusSymbol = "~";
+                        addToFailures = false;
+                    }
+                }
+
+                this.log(colorFunction(`\t${statusSymbol} ${domain}: ${res.numeric_host}, ${orgName}`));
+
+                if(addToFailures) {
+                    failures += 1;
+                } else {
+                    successes += 1;
+                }
             }
         }
 
@@ -68,6 +91,38 @@ class PingManager {
         const res = await ping.promise.probe(url);
         
         return res;
+    }
+
+    whois(url) {
+        return new Promise((resolve, reject) => {
+            whois.lookup(url, (err, data) => {
+                const dataObj = this.processWhoIsString(data);
+
+                resolve(dataObj);
+            });
+        });
+    }
+
+    processWhoIsString(data) {
+        const lines = data.split("\n");
+        let output = {};
+
+        for(let x = 0; x < lines.length; x++) {
+            const line = lines[x];
+
+            // skip "comment" lines (any lines starting with #)
+            if(line[0] === '#') {
+                continue;
+            }
+
+            const splitLine = line.split(/:(.+)/);
+            const index = splitLine[0].replace(":", "").trim();
+            const value = splitLine[1] ? splitLine[1].trim() : "";
+
+            output[index] = value;
+        }
+
+        return output;
     }
 
     log(message, logLevel = LOG_LEVEL.INFORMATION) {
