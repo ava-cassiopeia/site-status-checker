@@ -1,7 +1,7 @@
 {
   "name": "site-status-checker",
   "version": "0.1.0",
-  "description": "",
+  "description": "Simple Node CLI tool to check that a particular URL is resolving to the correct IP address. Will add more features in the future for checking site performance, running automated site tests, and more. See the roadmap for details.",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,5 +12,14 @@
   "dependencies": {
     "chalk": "^2.3.0",
     "ping": "^0.2.2"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aeolingamenfel/site-status-checker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aeolingamenfel/site-status-checker/issues"
+  },
+  "homepage": "https://github.com/aeolingamenfel/site-status-checker#readme"
 }
